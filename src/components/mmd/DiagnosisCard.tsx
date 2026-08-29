@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { motion } from "motion/react";
 import { toast } from "sonner";
 import { Check, Flag, CircleCheckBig, Send, Beaker } from "lucide-react";
@@ -161,7 +161,7 @@ export function DiagnosisCard({
                   </span>
                   <span className="flex-1 text-xs leading-relaxed">{e.fact}</span>
                   <span className="shrink-0 rounded border border-border px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
-                    {e.method} \u00b7 {e.source}
+                    {e.method} · {e.source}
                   </span>
                 </button>
               </motion.li>
@@ -216,20 +216,13 @@ export function DiagnosisCard({
           <div className="space-y-3">
             <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
               {kase.candidates.slice(0, 2).map((c, i) => (
-                <>
-                  {i === 1 && (
-                    <span key="vs" className="font-mono text-xs text-muted-foreground">
-                      vs
-                    </span>
-                  )}
-                  <div
-                    key={c.mechanism}
-                    className="rounded-lg border border-border bg-raised/60 p-3 text-center"
-                  >
+                <Fragment key={c.mechanism}>
+                  {i === 1 && <span className="font-mono text-xs text-muted-foreground">vs</span>}
+                  <div className="rounded-lg border border-border bg-raised/60 p-3 text-center">
                     <p className="text-xs font-semibold">{titleize(c.mechanism)}</p>
                     <p className="font-mono text-lg text-accent">{c.score.toFixed(2)}</p>
                   </div>
-                </>
+                </Fragment>
               ))}
             </div>
             {kase.separating_test && (
