@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import {
   Activity,
   ChevronLeft,
@@ -66,6 +66,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, [navigate, togglePersona]);
 
   const telemetry = data.telemetry;
+
+  const [sweep, setSweep] = useState(0);
+  const [prevPersona, setPrevPersona] = useState(persona);
+  if (prevPersona !== persona) {
+    setPrevPersona(persona);
+    setSweep((s) => s + 1);
+  }
+  const personaLabel =
+    persona === "regional_head" ? "Priya · Regional Head (North)" : "Dev · Central Analyst";
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
@@ -183,7 +192,62 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="min-w-0 flex-1 p-4 md:p-6">{children}</main>
+        <main className="relative min-w-0 flex-1">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={persona}
+              className="p-4 md:p-6"
+              initial={{ opacity: 0, y: 28, scale: 0.985, filter: "blur(10px)" }}
+              animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+              exit={{ opacity: 0, y: -20, scale: 0.99, filter: "blur(8px)" }}
+              transition={{ type: "spring", stiffness: 260, damping: 30, mass: 0.9 }}
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
+        </main>
+
+        <AnimatePresence>
+          {sweep > 0 && (
+            <motion.div
+              key={sweep}
+              className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center overflow-hidden"
+              initial="in"
+              animate="out"
+              exit={{ opacity: 0 }}
+            >
+              <motion.div
+                className="absolute inset-y-0 w-[140%] bg-gradient-to-r from-transparent via-accent/25 to-transparent"
+                variants={{
+                  in: { x: "-120%" },
+                  out: { x: "120%", transition: { duration: 0.7, ease: [0.7, 0, 0.2, 1] } },
+                }}
+              />
+              <motion.div
+                className="absolute inset-0 bg-accent/10"
+                variants={{ in: { opacity: 0.55 }, out: { opacity: 0, transition: { duration: 0.6 } } }}
+              />
+              <motion.div
+                className="relative flex items-center gap-3 rounded-xl border border-accent/50 bg-surface/90 px-5 py-3 shadow-[0_0_60px_-10px_color-mix(in_srgb,var(--accent)_60%,transparent)] backdrop-blur"
+                variants={{
+                  in: { opacity: 0, scale: 0.8, y: 12 },
+                  out: {
+                    opacity: [0, 1, 1, 0],
+                    scale: [0.8, 1.06, 1, 0.96],
+                    y: [12, 0, 0, -10],
+                    transition: { duration: 0.75, times: [0, 0.25, 0.7, 1] },
+                  },
+                }}
+              >
+                <span className="pulse-dot size-2 rounded-full bg-accent" />
+                <span className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
+                  Switching scope
+                </span>
+                <span className="font-display text-sm font-semibold">{personaLabel}</span>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <footer className="border-t border-border bg-surface px-4 py-3 text-[11px] leading-relaxed text-muted-foreground">
           Truth boundary: every number on this page was computed by SQL, statistics, business
