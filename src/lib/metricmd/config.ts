@@ -5,5 +5,5 @@ export interface MetricMDConfig {
 
 export const metricMDConfig: MetricMDConfig = {
   mode: "live",
-  baseUrl: "http://localhost:8000",
+  baseUrl: "https://business-crystal.onrender.com",
 };
