@@ -22,8 +22,8 @@ import { cn } from "@/lib/utils";
 import type { DiagnosisCase } from "@/lib/metricmd/types";
 
 interface DiagSearch {
-  case?: string;
-  mechanism?: string;
+  case?: string | undefined;
+  mechanism?: string | undefined;
 }
 
 export const Route = createFileRoute("/diagnoses")({
