@@ -67,6 +67,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const telemetry = data.telemetry;
 
+  const [sweep, setSweep] = useState(0);
+  const [prevPersona, setPrevPersona] = useState(persona);
+  if (prevPersona !== persona) {
+    setPrevPersona(persona);
+    setSweep((s) => s + 1);
+  }
+  const personaLabel =
+    persona === "regional_head" ? "Priya · Regional Head (North)" : "Dev · Central Analyst";
+
   return (
     <div className="flex min-h-screen bg-background text-foreground">
       <aside
