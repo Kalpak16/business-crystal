@@ -152,15 +152,17 @@ export function DiagnosisCard({
                   type="button"
                   onClick={() => highlight(e.id)}
                   className={cn(
-                    "focus-ring flex w-full items-start gap-2 rounded-md border border-transparent px-2 py-1.5 text-left transition-colors hover:border-border hover:bg-raised/60 active:scale-[0.995]",
+                    "focus-ring flex w-full flex-col gap-1 rounded-md border border-transparent px-2 py-1.5 text-left transition-colors hover:border-border hover:bg-raised/60 active:scale-[0.995]",
                     activeEvidence === e.id && "border-accent/50 bg-raised",
                   )}
                 >
-                  <span className="mt-0.5 rounded border border-border bg-raised px-1.5 py-0.5 font-mono text-[10px] text-accent">
-                    {e.id}
+                  <span className="flex items-start gap-2">
+                    <span className="mt-0.5 shrink-0 rounded border border-border bg-raised px-1.5 py-0.5 font-mono text-[10px] text-accent">
+                      {e.id}
+                    </span>
+                    <span className="min-w-0 flex-1 text-xs leading-relaxed">{e.fact}</span>
                   </span>
-                  <span className="flex-1 text-xs leading-relaxed">{e.fact}</span>
-                  <span className="shrink-0 rounded border border-border px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
+                  <span className="ml-7 w-fit rounded border border-border px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
                     {e.method} · {e.source}
                   </span>
                 </button>
