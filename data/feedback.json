@@ -1,0 +1,37 @@
+{
+ "events": [
+  {
+   "at": "2026-08-29T17:48:53",
+   "case_id": "MMD-104",
+   "verdict": "flag",
+   "mechanism": "UNKNOWN",
+   "note": "local festival closed the market for 4 days"
+  },
+  {
+   "at": "2026-08-29T17:54:10",
+   "case_id": "MMD-104",
+   "verdict": "flag",
+   "mechanism": "UNKNOWN",
+   "note": "local festival closed the market for 4 days"
+  }
+ ],
+ "mechanism_priors": {
+  "South:UNKNOWN": -0.2
+ },
+ "draft_fingerprints": [
+  {
+   "from_case": "MMD-104",
+   "region": "South",
+   "human_note": "local festival closed the market for 4 days",
+   "status": "draft",
+   "next": "analyst reviews, names the shape and corroborators, and it joins contract.yaml as a new fingerprint"
+  },
+  {
+   "from_case": "MMD-104",
+   "region": "South",
+   "human_note": "local festival closed the market for 4 days",
+   "status": "draft",
+   "next": "analyst reviews, names the shape and corroborators, and it joins contract.yaml as a new fingerprint"
+  }
+ ]
+}
