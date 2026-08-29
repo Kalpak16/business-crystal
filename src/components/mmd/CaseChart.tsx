@@ -78,7 +78,7 @@ export function CaseChart({
             fillOpacity={0.1}
             stroke="var(--accent)"
             strokeOpacity={0.25}
-            className={pulse ? "shade-pulse" : undefined}
+            className={pulse ? "shade-pulse" : ""}
           />
           <ReferenceLine
             y={baseline}
