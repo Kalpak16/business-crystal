@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DiagnosesRouteImport } from './routes/diagnoses'
 import { Route as EvaluationRouteImport } from './routes/evaluation'
+import { Route as FingerprintsRouteImport } from './routes/fingerprints'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,35 +29,44 @@ const EvaluationRoute = EvaluationRouteImport.update({
   path: '/evaluation',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FingerprintsRoute = FingerprintsRouteImport.update({
+  id: '/fingerprints',
+  path: '/fingerprints',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/diagnoses': typeof DiagnosesRoute
   '/evaluation': typeof EvaluationRoute
+  '/fingerprints': typeof FingerprintsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/diagnoses': typeof DiagnosesRoute
   '/evaluation': typeof EvaluationRoute
+  '/fingerprints': typeof FingerprintsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/diagnoses': typeof DiagnosesRoute
   '/evaluation': typeof EvaluationRoute
+  '/fingerprints': typeof FingerprintsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/diagnoses' | '/evaluation'
+  fullPaths: '/' | '/diagnoses' | '/evaluation' | '/fingerprints'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/diagnoses' | '/evaluation'
-  id: '__root__' | '/' | '/diagnoses' | '/evaluation'
+  to: '/' | '/diagnoses' | '/evaluation' | '/fingerprints'
+  id: '__root__' | '/' | '/diagnoses' | '/evaluation' | '/fingerprints'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DiagnosesRoute: typeof DiagnosesRoute
   EvaluationRoute: typeof EvaluationRoute
+  FingerprintsRoute: typeof FingerprintsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +92,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EvaluationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/fingerprints': {
+      id: '/fingerprints'
+      path: '/fingerprints'
+      fullPath: '/fingerprints'
+      preLoaderRoute: typeof FingerprintsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,6 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DiagnosesRoute: DiagnosesRoute,
   EvaluationRoute: EvaluationRoute,
+  FingerprintsRoute: FingerprintsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
