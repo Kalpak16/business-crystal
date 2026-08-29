@@ -51,11 +51,22 @@ async function fetchLive(persona: PersonaKey): Promise<EngineState> {
     fetch(`${baseUrl}/api/harness`).then((r) => r.json()),
     fetch(`${baseUrl}/api/telemetry`).then((r) => r.json()),
   ]);
+  const harnessCases = Array.isArray(harness)
+    ? harness
+    : Array.isArray(harness?.cases)
+      ? harness.cases
+      : Array.isArray(harness?.harness_cases)
+        ? harness.harness_cases
+        : Array.isArray(state?.harness_cases)
+          ? state.harness_cases
+          : engine.harness_cases;
+  const tel = telemetry?.telemetry ?? telemetry;
   return {
     ...engine,
     ...state,
-    harness_cases: harness.harness_cases ?? harness,
-    telemetry: telemetry.telemetry ?? telemetry,
+    scorecard: harness?.scorecard ?? state?.scorecard ?? engine.scorecard,
+    harness_cases: harnessCases,
+    telemetry: tel && Array.isArray(tel.stages) ? tel : engine.telemetry,
   } as EngineState;
 }
 
