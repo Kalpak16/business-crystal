@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   MessageSquareHeart,
   Search,
+  Users,
   Stethoscope,
 } from "lucide-react";
 import {
@@ -19,6 +20,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  CommandSeparator,
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { Heartbeat } from "./Heartbeat";
@@ -259,11 +261,64 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <CommandInput placeholder="Jump to a case, fingerprint or harness row" />
         <CommandList>
           <CommandEmpty>Nothing matches that query.</CommandEmpty>
+
+          <CommandGroup heading="Navigation">
+            {NAV.map(({ to, label, Icon }, i) => (
+              <CommandItem
+                key={to}
+                value={`go ${label}`}
+                onSelect={() => {
+                  setOpen(false);
+                  void navigate({ to });
+                }}
+              >
+                <Icon className="size-4 text-accent" />
+                <span>{label}</span>
+                <kbd className="ml-auto rounded border border-border px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
+                  {i + 1}
+                </kbd>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+
+          <CommandSeparator />
+
+          <CommandGroup heading="Actions">
+            <CommandItem
+              value="switch persona toggle Priya Dev"
+              onSelect={() => {
+                setOpen(false);
+                togglePersona();
+              }}
+            >
+              <Users className="size-4 text-accent" />
+              <span>
+                Switch persona to{" "}
+                {persona === "regional_head" ? "Dev · Central Analyst" : "Priya · Regional Head (North)"}
+              </span>
+              <kbd className="ml-auto rounded border border-border px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
+                P
+              </kbd>
+            </CommandItem>
+            <CommandItem
+              value="collapse expand left rail sidebar"
+              onSelect={() => {
+                setOpen(false);
+                setCollapsed((c) => !c);
+              }}
+            >
+              {collapsed ? <ChevronRight className="size-4 text-accent" /> : <ChevronLeft className="size-4 text-accent" />}
+              <span>{collapsed ? "Expand left rail" : "Collapse left rail"}</span>
+            </CommandItem>
+          </CommandGroup>
+
+          <CommandSeparator />
+
           <CommandGroup heading="Cases">
             {data.cases.map((c) => (
               <CommandItem
                 key={c.case_id}
-                value={`${c.case_id} ${c.title} ${c.region} ${c.category}`}
+                value={`${c.case_id} ${c.title} ${c.region} ${c.category} ${c.diagnosis ?? ""}`}
                 onSelect={() => {
                   setOpen(false);
                   void navigate({ to: "/diagnoses", search: { case: c.case_id } });
@@ -271,35 +326,61 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               >
                 <span className="font-mono text-xs text-accent">{c.case_id}</span>
                 <span className="truncate">{c.title}</span>
+                <span
+                  className={cn(
+                    "ml-auto shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px] uppercase",
+                    c.tier === "CONFIDENT" && "border-confident/40 text-confident",
+                    c.tier === "AMBIGUOUS" && "border-ambiguous/40 text-ambiguous",
+                    c.tier === "UNKNOWN" && "border-unknown/40 text-unknown",
+                  )}
+                >
+                  {c.tier}
+                </span>
               </CommandItem>
             ))}
           </CommandGroup>
+
           <CommandGroup heading="Fingerprints">
             {Object.keys(data.fingerprints).map((k) => (
               <CommandItem
                 key={k}
-                value={k}
+                value={`fingerprint ${k}`}
                 onSelect={() => {
                   setOpen(false);
-                  void navigate({ to: "/fingerprints" });
+                  void navigate({ to: "/diagnoses", search: { mechanism: k } });
                 }}
               >
-                {titleize(k)}
+                <Fingerprint className="size-4 text-accent" />
+                <span>{titleize(k)}</span>
+                <span className="ml-auto font-mono text-[10px] text-muted-foreground">
+                  filter diagnoses
+                </span>
               </CommandItem>
             ))}
           </CommandGroup>
+
           <CommandGroup heading="Harness rows">
             {data.harness_cases.map((h, i) => (
               <CommandItem
                 key={`${h.case}-${i}`}
-                value={`${h.case} ${h.expected} ${h.got}`}
+                value={`harness ${h.case} ${h.expected} ${h.got}`}
                 onSelect={() => {
                   setOpen(false);
                   void navigate({ to: "/evaluation" });
                 }}
               >
                 <span className="font-mono text-xs">{h.case}</span>
-                <span className="text-muted-foreground">{h.got}</span>
+                <span className="truncate text-muted-foreground">{h.got}</span>
+                <span
+                  className={cn(
+                    "ml-auto shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px]",
+                    h.ok
+                      ? "border-confident/40 text-confident"
+                      : "border-unknown/40 text-unknown",
+                  )}
+                >
+                  {h.ok ? "PASS" : "FAIL"}
+                </span>
               </CommandItem>
             ))}
           </CommandGroup>
