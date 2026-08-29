@@ -4,6 +4,6 @@ export interface MetricMDConfig {
 }
 
 export const metricMDConfig: MetricMDConfig = {
-  mode: "mock",
+  mode: "live",
   baseUrl: "http://localhost:8000",
 };
