@@ -2,17 +2,12 @@ import { cn } from "@/lib/utils";
 
 /** Brand motif: a thin looping purple ECG line. */
 export function Heartbeat({ className }: { className?: string }) {
-  const seg = "0 12 L 14 12 L 20 12 L 24 4 L 28 20 L 32 12 L 38 12 L 44 9 L 48 12 L 70 12";
-  const path = `M ${seg} M 70 12 L ${seg
-    .split("L")
-    .map((p) => p.trim())
-    .map((p, i) => {
-      if (i === 0) return "";
-      const [x, y] = p.split(" ");
-      return `L ${Number(x) + 70} ${y}`;
-    })
-    .join(" ")
-    .replace(/^\s*/, "")}`;
+  const pts = [
+    [0, 12], [14, 12], [20, 12], [24, 4], [28, 20], [32, 12], [38, 12], [44, 9], [48, 12], [70, 12],
+  ] as const;
+  const build = (offset: number) =>
+    pts.map(([x, y], i) => `${i === 0 ? "M" : "L"} ${x + offset} ${y}`).join(" ");
+  const path = `${build(0)} ${build(70)}`;
 
   return (
     <div className={cn("relative h-6 overflow-hidden", className)} aria-hidden="true">
