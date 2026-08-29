@@ -33,7 +33,7 @@ export function TierBadge({
       Icon: Scale,
     },
   };
-  const conf = map[tier] ?? map.QUIET!;
+  const conf = map[tier] ?? map["QUIET"]!;
   const { label, cls, Icon } = conf;
 
   return (
