@@ -120,7 +120,7 @@ export interface FeedbackEvent {
   id: string;
   case_id: string;
   verdict: "accept" | "flag";
-  note?: string;
+  note?: string | undefined;
   persona: PersonaKey;
   personaName: string;
   at: string;
