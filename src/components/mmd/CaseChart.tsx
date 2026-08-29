@@ -11,7 +11,7 @@ import {
   YAxis,
 } from "recharts";
 import type { DiagnosisCase } from "@/lib/metricmd/types";
-import { fmtDate, fmtINR } from "@/lib/metricmd/format";
+import { fmtDate } from "@/lib/metricmd/format";
 
 function ChartTooltip({
   active,
