@@ -31,7 +31,7 @@ function ChartTooltip({
   kpi: string;
 }) {
   if (!active || !payload?.length || label == null) return null;
-  const value = payload[0].value;
+  const value = payload[0]?.value ?? 0;
   const delta = value - baseline;
   const deltaPct = baseline !== 0 ? (delta / Math.abs(baseline)) * 100 : 0;
   const inWindow = label >= winStart && label <= winEnd;
