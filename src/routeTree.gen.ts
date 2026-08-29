@@ -10,33 +10,79 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DiagnosesRouteImport } from './routes/diagnoses'
+import { Route as EvaluationRouteImport } from './routes/evaluation'
+import { Route as FeedbackRouteImport } from './routes/feedback'
+import { Route as FingerprintsRouteImport } from './routes/fingerprints'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DiagnosesRoute = DiagnosesRouteImport.update({
+  id: '/diagnoses',
+  path: '/diagnoses',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EvaluationRoute = EvaluationRouteImport.update({
+  id: '/evaluation',
+  path: '/evaluation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeedbackRoute = FeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FingerprintsRoute = FingerprintsRouteImport.update({
+  id: '/fingerprints',
+  path: '/fingerprints',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/diagnoses': typeof DiagnosesRoute
+  '/evaluation': typeof EvaluationRoute
+  '/feedback': typeof FeedbackRoute
+  '/fingerprints': typeof FingerprintsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/diagnoses': typeof DiagnosesRoute
+  '/evaluation': typeof EvaluationRoute
+  '/feedback': typeof FeedbackRoute
+  '/fingerprints': typeof FingerprintsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/diagnoses': typeof DiagnosesRoute
+  '/evaluation': typeof EvaluationRoute
+  '/feedback': typeof FeedbackRoute
+  '/fingerprints': typeof FingerprintsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/diagnoses' | '/evaluation' | '/feedback' | '/fingerprints'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/diagnoses' | '/evaluation' | '/feedback' | '/fingerprints'
+  id:
+    | '__root__'
+    | '/'
+    | '/diagnoses'
+    | '/evaluation'
+    | '/feedback'
+    | '/fingerprints'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DiagnosesRoute: typeof DiagnosesRoute
+  EvaluationRoute: typeof EvaluationRoute
+  FeedbackRoute: typeof FeedbackRoute
+  FingerprintsRoute: typeof FingerprintsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +94,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/diagnoses': {
+      id: '/diagnoses'
+      path: '/diagnoses'
+      fullPath: '/diagnoses'
+      preLoaderRoute: typeof DiagnosesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/evaluation': {
+      id: '/evaluation'
+      path: '/evaluation'
+      fullPath: '/evaluation'
+      preLoaderRoute: typeof EvaluationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feedback': {
+      id: '/feedback'
+      path: '/feedback'
+      fullPath: '/feedback'
+      preLoaderRoute: typeof FeedbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fingerprints': {
+      id: '/fingerprints'
+      path: '/fingerprints'
+      fullPath: '/fingerprints'
+      preLoaderRoute: typeof FingerprintsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DiagnosesRoute: DiagnosesRoute,
+  EvaluationRoute: EvaluationRoute,
+  FeedbackRoute: FeedbackRoute,
+  FingerprintsRoute: FingerprintsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
