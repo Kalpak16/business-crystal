@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DiagnosesRouteImport } from './routes/diagnoses'
 import { Route as EvaluationRouteImport } from './routes/evaluation'
+import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as FingerprintsRouteImport } from './routes/fingerprints'
 
 const IndexRoute = IndexRouteImport.update({
@@ -29,6 +30,11 @@ const EvaluationRoute = EvaluationRouteImport.update({
   path: '/evaluation',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FeedbackRoute = FeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FingerprintsRoute = FingerprintsRouteImport.update({
   id: '/fingerprints',
   path: '/fingerprints',
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/diagnoses': typeof DiagnosesRoute
   '/evaluation': typeof EvaluationRoute
+  '/feedback': typeof FeedbackRoute
   '/fingerprints': typeof FingerprintsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/diagnoses': typeof DiagnosesRoute
   '/evaluation': typeof EvaluationRoute
+  '/feedback': typeof FeedbackRoute
   '/fingerprints': typeof FingerprintsRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,28 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/diagnoses': typeof DiagnosesRoute
   '/evaluation': typeof EvaluationRoute
+  '/feedback': typeof FeedbackRoute
   '/fingerprints': typeof FingerprintsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/diagnoses' | '/evaluation' | '/fingerprints'
+  fullPaths: '/' | '/diagnoses' | '/evaluation' | '/feedback' | '/fingerprints'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/diagnoses' | '/evaluation' | '/fingerprints'
-  id: '__root__' | '/' | '/diagnoses' | '/evaluation' | '/fingerprints'
+  to: '/' | '/diagnoses' | '/evaluation' | '/feedback' | '/fingerprints'
+  id:
+    | '__root__'
+    | '/'
+    | '/diagnoses'
+    | '/evaluation'
+    | '/feedback'
+    | '/fingerprints'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DiagnosesRoute: typeof DiagnosesRoute
   EvaluationRoute: typeof EvaluationRoute
+  FeedbackRoute: typeof FeedbackRoute
   FingerprintsRoute: typeof FingerprintsRoute
 }
 
@@ -92,6 +108,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EvaluationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/feedback': {
+      id: '/feedback'
+      path: '/feedback'
+      fullPath: '/feedback'
+      preLoaderRoute: typeof FeedbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/fingerprints': {
       id: '/fingerprints'
       path: '/fingerprints'
@@ -106,6 +129,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DiagnosesRoute: DiagnosesRoute,
   EvaluationRoute: EvaluationRoute,
+  FeedbackRoute: FeedbackRoute,
   FingerprintsRoute: FingerprintsRoute,
 }
 export const routeTree = rootRouteImport
