@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DiagnosesRouteImport } from './routes/diagnoses'
+import { Route as EvaluationRouteImport } from './routes/evaluation'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +23,40 @@ const DiagnosesRoute = DiagnosesRouteImport.update({
   path: '/diagnoses',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EvaluationRoute = EvaluationRouteImport.update({
+  id: '/evaluation',
+  path: '/evaluation',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/diagnoses': typeof DiagnosesRoute
+  '/evaluation': typeof EvaluationRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/diagnoses': typeof DiagnosesRoute
+  '/evaluation': typeof EvaluationRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/diagnoses': typeof DiagnosesRoute
+  '/evaluation': typeof EvaluationRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/diagnoses'
+  fullPaths: '/' | '/diagnoses' | '/evaluation'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/diagnoses'
-  id: '__root__' | '/' | '/diagnoses'
+  to: '/' | '/diagnoses' | '/evaluation'
+  id: '__root__' | '/' | '/diagnoses' | '/evaluation'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DiagnosesRoute: typeof DiagnosesRoute
+  EvaluationRoute: typeof EvaluationRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +75,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DiagnosesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/evaluation': {
+      id: '/evaluation'
+      path: '/evaluation'
+      fullPath: '/evaluation'
+      preLoaderRoute: typeof EvaluationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DiagnosesRoute: DiagnosesRoute,
+  EvaluationRoute: EvaluationRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
