@@ -119,7 +119,12 @@ export function DiagnosisCard({
           </span>
         </div>
 
-        <CaseChart kase={kase} pulse={pulse} height={compact ? 140 : 170} />
+        <CaseChart
+          kase={kase}
+          pulse={pulse}
+          highlighted={activeEvidence !== null}
+          height={compact ? 140 : 170}
+        />
 
         <div>
           <div className="mb-1.5 flex items-center justify-between text-[11px] uppercase tracking-wider text-muted-foreground">
@@ -151,6 +156,10 @@ export function DiagnosisCard({
                 <button
                   type="button"
                   onClick={() => highlight(e.id)}
+                  onMouseEnter={() => setActiveEvidence(e.id)}
+                  onMouseLeave={() => setActiveEvidence(null)}
+                  onFocus={() => setActiveEvidence(e.id)}
+                  onBlur={() => setActiveEvidence(null)}
                   className={cn(
                     "focus-ring flex w-full flex-col gap-1 rounded-md border border-transparent px-2 py-1.5 text-left transition-colors hover:border-border hover:bg-raised/60 active:scale-[0.995]",
                     activeEvidence === e.id && "border-accent/50 bg-raised",
