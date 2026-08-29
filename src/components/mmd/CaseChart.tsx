@@ -54,7 +54,7 @@ function ChartTooltip({
           {kpi}
         </span>
         <span className="font-mono text-sm font-semibold text-foreground">
-          {fmtINR(value)}
+          {`${Math.round(value).toLocaleString("en-IN")} INR`}
         </span>
       </div>
       <div className="mt-1 flex items-baseline justify-between gap-3 border-t border-border/60 pt-1">
