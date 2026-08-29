@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   MessageSquareHeart,
   Search,
+  Users,
   Stethoscope,
 } from "lucide-react";
 import {
@@ -19,6 +20,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  CommandSeparator,
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { Heartbeat } from "./Heartbeat";
@@ -372,12 +374,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <span
                   className={cn(
                     "ml-auto shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px]",
-                    h.pass
+                    h.ok
                       ? "border-confident/40 text-confident"
                       : "border-unknown/40 text-unknown",
                   )}
                 >
-                  {h.pass ? "PASS" : "FAIL"}
+                  {h.ok ? "PASS" : "FAIL"}
                 </span>
               </CommandItem>
             ))}
