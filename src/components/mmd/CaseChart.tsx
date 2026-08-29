@@ -11,16 +11,78 @@ import {
   YAxis,
 } from "recharts";
 import type { DiagnosisCase } from "@/lib/metricmd/types";
-import { fmtDate } from "@/lib/metricmd/format";
+import { fmtDate, fmtINR } from "@/lib/metricmd/format";
+
+function ChartTooltip({
+  active,
+  payload,
+  label,
+  baseline,
+  winStart,
+  winEnd,
+  kpi,
+}: {
+  active?: boolean;
+  payload?: Array<{ value: number }>;
+  label?: string;
+  baseline: number;
+  winStart: string;
+  winEnd: string;
+  kpi: string;
+}) {
+  if (!active || !payload?.length || label == null) return null;
+  const value = payload[0].value;
+  const delta = value - baseline;
+  const deltaPct = baseline !== 0 ? (delta / Math.abs(baseline)) * 100 : 0;
+  const inWindow = label >= winStart && label <= winEnd;
+  const down = delta < 0;
+
+  return (
+    <div className="min-w-44 rounded-lg border border-accent/30 bg-raised/95 px-3 py-2 shadow-[0_8px_24px_-8px_rgba(0,0,0,0.7),0_0_12px_-4px_var(--accent)] backdrop-blur-sm">
+      <div className="flex items-center justify-between gap-3">
+        <span className="font-mono text-[11px] font-medium text-foreground">
+          {fmtDate(label)}
+        </span>
+        {inWindow && (
+          <span className="rounded border border-accent/40 bg-accent/15 px-1.5 py-px text-[9px] font-semibold uppercase tracking-wider text-accent">
+            window
+          </span>
+        )}
+      </div>
+      <div className="mt-1.5 flex items-baseline justify-between gap-3">
+        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+          {kpi}
+        </span>
+        <span className="font-mono text-sm font-semibold text-foreground">
+          {fmtINR(value)}
+        </span>
+      </div>
+      <div className="mt-1 flex items-baseline justify-between gap-3 border-t border-border/60 pt-1">
+        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+          vs baseline
+        </span>
+        <span
+          className="font-mono text-[11px] font-medium"
+          style={{ color: down ? "var(--unknown)" : "var(--confident)" }}
+        >
+          {down ? "\u2212" : "+"}
+          {Math.abs(deltaPct).toFixed(1)}%
+        </span>
+      </div>
+    </div>
+  );
+}
 
 export function CaseChart({
   kase,
   height = 160,
   pulse = false,
+  highlighted = false,
 }: {
   kase: DiagnosisCase;
   height?: number;
   pulse?: boolean;
+  highlighted?: boolean;
 }) {
   const baseline = useMemo(() => {
     const pre = kase.series.slice(0, kase.window_start_index);
@@ -31,6 +93,7 @@ export function CaseChart({
   const winStart = kase.series[kase.window_start_index]?.day ?? kase.window[0];
   const winEnd = kase.series[kase.series.length - 1]?.day ?? kase.window[1];
   const gid = `mmd-fill-${kase.case_id}`;
+  const active = highlighted || pulse;
 
   return (
     <div style={{ height }} className="w-full">
@@ -60,26 +123,48 @@ export function CaseChart({
             tickFormatter={(v: number) => `${Math.round(v / 1000)}k`}
           />
           <Tooltip
-            cursor={{ stroke: "var(--accent)", strokeWidth: 1 }}
-            contentStyle={{
-              background: "var(--raised)",
-              border: "1px solid var(--hairline)",
-              borderRadius: 8,
-              color: "var(--foreground)",
-              fontSize: 12,
+            cursor={{
+              stroke: "var(--accent)",
+              strokeWidth: 1,
+              strokeDasharray: "3 3",
+              strokeOpacity: 0.7,
             }}
-            labelFormatter={(l: string) => l}
-            formatter={(v: number) => [`${Math.round(v).toLocaleString("en-IN")} INR`, kase.kpi]}
+            content={
+              <ChartTooltip
+                baseline={baseline}
+                winStart={winStart}
+                winEnd={winEnd}
+                kpi={kase.kpi}
+              />
+            }
           />
           <ReferenceArea
             x1={winStart}
             x2={winEnd}
             fill="var(--accent)"
-            fillOpacity={0.1}
+            fillOpacity={active ? 0.22 : 0.1}
             stroke="var(--accent)"
-            strokeOpacity={0.25}
+            strokeOpacity={active ? 0.65 : 0.25}
+            strokeWidth={active ? 1.5 : 1}
             className={pulse ? "shade-pulse" : ""}
+            style={{ transition: "fill-opacity 200ms ease, stroke-opacity 200ms ease" }}
           />
+          {active && (
+            <>
+              <ReferenceLine
+                x={winStart}
+                stroke="var(--accent)"
+                strokeOpacity={0.9}
+                strokeWidth={1.5}
+              />
+              <ReferenceLine
+                x={winEnd}
+                stroke="var(--accent)"
+                strokeOpacity={0.9}
+                strokeWidth={1.5}
+              />
+            </>
+          )}
           <ReferenceLine
             y={baseline}
             stroke="var(--muted-foreground)"
@@ -93,7 +178,12 @@ export function CaseChart({
             strokeWidth={2}
             fill={`url(#${gid})`}
             dot={false}
-            activeDot={{ r: 3, fill: "var(--accent)" }}
+            activeDot={{
+              r: 4,
+              fill: "var(--accent)",
+              stroke: "var(--background)",
+              strokeWidth: 2,
+            }}
             animationDuration={800}
             animationEasing="ease-out"
           />
