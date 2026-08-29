@@ -228,7 +228,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 variants={{ in: { opacity: 0.55 }, out: { opacity: 0, transition: { duration: 0.6 } } }}
               />
               <motion.div
-                className="relative flex items-center gap-3 rounded-xl border border-accent/50 bg-surface/90 px-5 py-3 shadow-[0_0_60px_-10px_hsl(var(--accent)/0.6)] backdrop-blur"
+                className="relative flex items-center gap-3 rounded-xl border border-accent/50 bg-surface/90 px-5 py-3 shadow-[0_0_60px_-10px_color-mix(in_srgb,var(--accent)_60%,transparent)] backdrop-blur"
                 variants={{
                   in: { opacity: 0, scale: 0.8, y: 12 },
                   out: {
