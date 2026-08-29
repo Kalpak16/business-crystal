@@ -17,12 +17,13 @@ Endpoints
         (accept +0.05, flag -0.10) and, for flags with a note or UNKNOWN
         cases, a draft fingerprint entry: the library compounding, made real.
 """
-import json, datetime as dt
+import json, datetime as dt, os
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
 
-STATE = "data/frontend_data.json"
-FEEDBACK = "data/feedback.json"
+ROOT = os.path.dirname(os.path.abspath(__file__))
+STATE = os.path.join(ROOT, "data", "frontend_data.json")
+FEEDBACK = os.path.join(ROOT, "data", "feedback.json")
 MASK_METHODS_FOR_EXEC = {"business_rules"}   # analyst internals masked for execs
 
 
@@ -84,6 +85,11 @@ class H(BaseHTTPRequestHandler):
                                     "cases": state.get("harness_cases", [])})
         if u.path == "/api/telemetry":
             return self._send(200, state.get("telemetry", {}))
+        if u.path in ("/", "/health"):
+            return self._send(200, {"ok": True, "service": "MetricMD API",
+                                    "cases": len(state.get("cases", [])),
+                                    "endpoints": ["/api/state", "/api/harness",
+                                                  "/api/telemetry", "POST /api/feedback"]})
         return self._send(404, {"error": "unknown endpoint"})
 
     def do_POST(self):
@@ -123,6 +129,7 @@ class H(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    print("MetricMD API on http://localhost:8000  (GET /api/state, /api/harness, "
+    port = int(os.environ.get("PORT", 8000))
+    print(f"MetricMD API on port {port}  (GET /api/state, /api/harness, "
           "/api/telemetry, POST /api/feedback)")
-    HTTPServer(("0.0.0.0", 8000), H).serve_forever()
+    HTTPServer(("0.0.0.0", port), H).serve_forever()
