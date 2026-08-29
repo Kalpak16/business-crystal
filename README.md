@@ -1,50 +1,103 @@
-# MetricMD Pulse
+# MetricMD
 
-Build "MetricMD Console", a dark, premium, highly interactive diagnostic analytics web app. MetricMD is "the diagnosis layer for business metrics": a deterministic engine detects KPI movements, diagnoses the business cause against a fingerprint library, tries to falsify its own answer with a control group, abstains honestly when unsure, and rechecks later whether its own prescription worked. The frontend must feel like a mission control room for a business, think Linear meets Grafana meets a hospital monitor, and every number shown comes from real engine JSON, never invented.
+**The diagnosis layer for business metrics.** Dashboards report WHAT changed. MetricMD tells you WHY, tests its own answer against a control group, refuses to guess when the evidence is thin, and comes back later to check whether its own prescription worked.
 
-TECH AND QUALITY BAR React + TypeScript + Tailwind + shadcn/ui + Recharts + Framer Motion. Fully responsive. Every interactive element has hover, focus, and pressed states. Use skeleton loaders on first paint. Animate everything meaningfully but never gratuitously: numbers count up once, cards stagger in 60ms apart, drawers spring, charts draw their lines left to right over 800ms on first reveal.
+Team Phoenix, IIT Kanpur. Accenture Innovation Challenge 2026, Round 2, Track 3 (BusinessIntelligence.ai).
 
-DESIGN SYSTEM (exact values) Background #100D17, surface #17141F, raised surface #241238, hairlines #322050. Primary purple #7500C0, accent #A100FF, text #EDE7F6, muted #B9A6D6. Semantic: confident green #2ECC71, ambiguous amber #F5C97B, unknown/blocked red #FF6B5E. Font: Inter or Space Grotesk for headings. Cards: 12px radius, 1px #322050 border, subtle inner glow on hover (accent at 8% opacity). A thin animated purple "heartbeat" ECG line is the brand motif: render it in the header, subtly looping.
+Built by Kalpak Agrawal, Sanket Bansal, Karmanya Goyal.
 
-DATA Load the provided JSON (schema below) as the single source of truth. Top level keys: business, personas, fingerprints, scorecard, harness_cases, telemetry, cases. Each case has: case_id, title, region, category, window [start,end], pct, delta_inr, mean_z, tier (CONFIDENT | AMBIGUOUS | UNKNOWN), confidence 0..1, shape, diagnosis, candidates [{mechanism, score}], evidence [{id, fact, method, source}], localization, control [region, z pairs], separating_test, human_ask, playbook {action, owner, recheck_days}, verification {verdict, mean_z_after, healed} or null, series [{day, value}], window_start_index.
 
-APP SHELL Left rail (collapsible, 64px collapsed): logo "MetricMD" with the MD in accent purple, nav items Overview, Diagnoses, Evaluation, Fingerprint Library, Feedback. Top bar: global search (cmd+K opens a command palette that jumps to any case, fingerprint or harness row), a live telemetry chip showing "engine 76 ms · 0 tokens · INR 0.00" pulsing gently, and THE PERSONA SWITCHER, a segmented control with two avatars: "Priya · Regional Head (North)" and "Dev · Central Analyst". The persona switcher is the hero interaction of the whole app: switching personas re-filters everything with a smooth exit and enter animation, and cases outside Priya's contract scope do not merely hide, they are replaced by a red-bordered "ENTITLEMENT" card stating: "Withheld by contract. This access attempt is audit logged." For Priya also show a small "N evidence lines masked" pill on visible cases and hide all but the top candidate.
+## The one number that matters
 
-SCREEN 1, OVERVIEW Hero strip of five animated stat tiles from scorecard (count up on mount): 88.5% detection recall, 80.0% diagnosis accuracy, 0.0% false alarms, 83.3% correct honest UNKNOWNs, and an amber tile "1.4% wrong but confident (1 of 73 runs)". Under it, a caption in muted text: "Measured on 73 blind planted runs. python harness.py reproduces every number." Below: a 2x2 grid of Diagnosis Cards (see anatomy next) for the four cases, plus one red Entitlement card slot when the persona is Priya. Right column: a "This quarter" activity feed derived from the cases (detected, diagnosed, control test passed, verified RESOLVED) with timestamps from the window dates, and a compact region x category heat strip where the four affected cells glow by severity (abs mean_z).
+We do not ask you to trust the engine. We measured it. `harness.py` plants **73 labeled runs** (8 mechanisms, 3 random seeds, weak signals, a two-cause world, a sparse-history world, 12 clean series) and scores the engine blind:
 
-DIAGNOSIS CARD ANATOMY (the core component, obsess over it) Header row: case_id chip, Region / Category, window dates. Tier badge: CONFIDENT in green with the confidence value, AMBIGUOUS amber, HONEST UNKNOWN red with a small handshake icon. Big KPI line: "net_revenue −9.1% (−51,809 INR)" with the percent colored by sign. THE CHART: a Recharts area+line sparkline of series with the diagnosis window (from window_start_index) shaded in accent purple at 10%, a dashed baseline reference line, and a tooltip on hover showing day and value; on first render the line draws itself. Confidence meter: a slim gradient bar (purple to accent) animating to confidence width. Evidence list: each row as "E1" mono chip + fact text + a right-aligned method·source chip (statistics · pos_sales etc.); rows reveal one by one when the card enters. Clicking any evidence row highlights the corresponding zone of the chart (window shade pulses). Footer varies by tier: CONFIDENT shows a "NEXT STEP" amber panel (playbook action, Owner, Recheck in N days) and, if verification exists, a green "VERIFIED · RESOLVED, mean z after −0.09" ribbon with a checkmark draw animation; AMBIGUOUS shows both top candidates as a versus layout with their scores and a highlighted "The one test that separates them" panel (separating_test) with a "Run this check" ghost button; UNKNOWN shows the human_ask in a red panel plus a text input "Answer as the ops lead..." whose submit fires the feedback flow below and shows a toast "Draft fingerprint #9 created, the library just grew." Every card has Accept and Flag buttons: Accept fills green with a burst micro-animation and increments a visible "prior +0.05" chip; Flag opens a small popover asking "what did the engine miss?" then shows "prior −0.10, draft fingerprint queued". Persist these in local state and reflect them in the Feedback screen.
+| Metric | Result | Meaning |
+|---|---|---|
+| Detection recall on planted movements | **88.5%** (54/61) | material movements caught |
+| Diagnosis accuracy, top 1 named cause | **80.0%** (44/55) | the fingerprint named is the planted one |
+| False alarm rate on clean series | **0.0%** (0/12) | tuned so a quiet dashboard stays quiet |
+| Correct honest UNKNOWN rate | **83.3%** (5/6) | novel causes get UNKNOWN, not a guess |
+| Wrong but confident answers | **1 of 73 runs (1.4%)** | the failure mode that destroys trust |
 
-SCREEN 2, DIAGNOSES A filterable table/board toggle of all cases: filters by tier, region, category; sort by severity or confidence. Clicking a row opens a full-height right drawer with the complete card, plus two extra analyst-only sections (hidden for Priya): "Candidates" as a horizontal bar chart of candidates scores with the losing bars in muted purple and a caption explaining caps ("competitor capped: delay tickets contradict it"), and "Control test" as four mini region tiles showing each control z value, green when inside the band, with the verdict sentence.
+Every miss has a name: 8 of 12 failures are the engine staying QUIET on deliberately weak signals (the price we pay for a zero false alarm rate), 3 are safe UNKNOWNs, 1 is a genuine error. Reproduce it yourself: `python harness.py`.
 
-SCREEN 3, EVALUATION (the credibility weapon, make it beautiful) Top: the five scorecard tiles again, smaller. Then a per-mechanism accuracy panel: horizontal bars for stockout 6/6, price_rise 6/6, campaign_end 3/3, cannibalization 3/3, supply_shortage 5/6, competitor_entry 4/6, delivery_degradation 4/6, discount_launch 2/3, hard mode 7/12, unknown 5/6, sparse+clean 13/13, full-width green when perfect, amber otherwise. Then the full harness table from harness_cases: columns case, expected, got, tier, PASS/FAIL with colored pills; filter chips All / Failures only / Unknowns; a sticky footer line: "8 of 12 failures are deliberate QUIETs on weak signals, the price of a 0% false alarm rate. 3 are safe UNKNOWNs. 1 is a genuine error." Add a small "philosophy" callout card: "When MetricMD is wrong it is almost never confidently wrong. That is the metric that keeps trust alive."
+## The truth boundary (the brief's core mandate, implemented)
 
-SCREEN 4, FINGERPRINT LIBRARY A gallery grid of the 8 fingerprints from fingerprints. Each card: mechanism name, an ANIMATED miniature SVG of its shape drawn as a path animation on scroll into view (cliff_rebound: flat, sharp drop, floor, sharp recovery; step_down_persistent: flat then permanent step down; slow_slide: accelerating descent; spike_return: rise, plateau, fall to base; lift: step up; drift_down: gentle decline), the playbook text, owner chip, recovery_days chip. One extra dashed-border card at the end: "Fingerprint #9, drafting..." showing any draft created from the UNKNOWN flow, reinforcing "the library compounds like a physician's casebook." Clicking a fingerprint filters the Diagnoses screen to cases matching it.
+> "The LLM should not be treated as the source of quantitative truth."
 
-SCREEN 5, FEEDBACK Timeline of Accept/Flag events with persona attribution, a "mechanism priors" list showing region:mechanism keys with +/− values as green/red deltas, and the draft fingerprints queue with status "draft, awaiting analyst naming". Empty state copy: "No feedback yet. Every Accept or Flag trains the library."
+In MetricMD this is architecture, not a slogan. The pipeline is six deterministic stages, and the LLM is legal in exactly one place:
 
-GLOBAL DETAILS A persistent thin footer: "Truth boundary: every number on this page was computed by SQL, statistics, business rules or retrieval before any narrative existed. Generated at 0 LLM tokens." Dark mode only. Add keyboard shortcuts (1..5 for nav, p to toggle persona). Toasts via shadcn sonner. Loading, empty, and blocked states designed, never blank. No lorem ipsum anywhere; use only strings from the JSON or the copy in this prompt.
+| Stage | Method | LLM allowed? |
+|---|---|---|
+| DETECT | day-of-week seasonal baseline + robust z on residuals (statistics) | No |
+| LOCALIZE | contribution decomposition across contract dimensions (SQL + algebra) | No |
+| DIAGNOSE | feature probes matched against a fingerprint library (business rules) | No |
+| FALSIFY | control-group test across untouched regions (statistics) | No |
+| VERIFY | post-action recheck against the expected band (statistics) | No |
+| NARRATE | phrase the evidence list, cite every sentence | **Yes, phrasing only** |
 
-DO NOT Do not invent numbers, do not add fake logos, do not use light theme, do not use generic blue, do not put an em dash anywhere in the UI copy.
+Every fact carries an evidence id (E1, E2, ...) with its method and source system. The narrative layer may only phrase facts that exist in that list. By default the prototype ships with a deterministic template narrator (zero keys, zero cost); set `METRICMD_LLM=1` to route the same evidence JSON through a model under the phrase-only instruction. Either way, every number exists before the narrator is loaded.
 
-LATER, LIVE MODE (build a small data layer now) Wrap data access in a useMetricMD() hook reading from a config: mode "mock" uses the pasted JSON; mode "live" fetches GET {baseUrl}/api/state?persona=..., GET /api/harness, GET /api/telemetry and POSTs feedback to /api/feedback with {case_id, verdict, note}. Default baseUrl http://localhost:8000. CORS is already enabled on the backend.
+## Quick start (3 commands, 1 dependency)
 
-This project was built with [Lovable](https://lovable.dev).
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/7bc7d4d0-d78e-42a7-94b3-944e6afa05c5).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
+```bash
+pip install pyyaml
+python harness.py     # regenerate data, run all 62 scored scenarios
+python demo.py        # the four-story walkthrough below
+python dashboard.py   # renders the same run as dashboard.html, open it in a browser
+python export_frontend.py && python api.py   # JSON API on :8000 for the React console
 ```
+
+`dashboard.html` is the product face: the four diagnosis cards with sparklines drawn from the actual generated data, confidence bars, evidence chips with method and source, the entitlement block and live telemetry. Every string and number on it is engine output; the engine writes the page.
+
+Pure Python standard library everywhere except YAML parsing. No API keys required.
+
+## The four-story demo
+
+`demo.py` builds one simulated quarter with four planted realities and walks them end to end:
+
+1. **The dip with a cause in no table** (North / Dairy). Revenue drops 9%. No sales column explains it. The engine pulls avg delivery time from POS (11 to 18 min), retrieves ticket text citing rider delays from the ops system, diagnoses `delivery_degradation` at 0.72, prescribes the contract playbook, then **rechecks 10 days later and reports RESOLVED, diagnosis confirmed**. No rival engine audits its own advice.
+2. **The slow bleed** (West / Beverages). Minus 2% a week, never a single-day alarm. Trajectory classification catches the slide, the control test proves it is local to West, diagnosis `competitor_entry` at 0.80.
+3. **The win, explained** (East / Household). A +7% lift gets the same treatment: `discount_launch`, price evidence cited, promo ROI action. Wins deserve explanations too.
+4. **The honest unknown** (South / Household). A shock no fingerprint fits. Best score 0.45, below the confidence floor. The engine says UNKNOWN, routes a question to the nearest human, and the answer becomes a new fingerprint. Refusing to guess is a feature.
+
+Plus: an entitlement block (Priya, contract-scoped to North, asks about West and is refused with an audit log), executive vs analyst narrative depth, and runtime telemetry (83 ms full pipeline, token and INR cost meters).
+
+## Rubric coverage, checkboxed
+
+| Round 2 minimum expectation | Where |
+|---|---|
+| 3 to 5 connected KPIs, 2 to 3 sources, different grains and cadences | `contracts/contract.yaml`: net_revenue, units_sold, avg_delivery_min over daily POS, weekly marketing, event-grain tickets |
+| Lightweight semantic contract (definitions, drivers, thresholds, lineage, access) | `contracts/contract.yaml`, the engine knows nothing outside it |
+| Two personas with different narratives and actions | regional_head (executive, lever-scoped) vs central_analyst (full depth) |
+| One multi-factor movement with known drivers | harness `double-cause` world (delivery degradation + price rise together) |
+| One low-confidence abstention scenario | Story D plus 6 UNKNOWN harness runs |
+| One sparse-history scenario | harness `sparse-1`: 40 days of history, contract floor is 42, engine abstains by rule |
+| One role-based security scenario | entitlement block in `demo.py`, enforced from the contract |
+| Evidence with freshness, method, contribution, confidence, lineage | every evidence id carries method + source; confidence is a scored blend |
+| Clear LLM vs non-LLM breakdown | table above, enforced in `narrate.py` |
+| Runtime telemetry: latency, model calls, tokens, cost | `Telemetry` class, printed in every demo run |
+
+## Repository layout
+
+```
+contracts/contract.yaml   semantic contract, the single source of truth
+metricmd/datagen.py       three mismatched source systems, plantable mechanisms
+metricmd/engine.py        the deterministic core, six stages, zero LLM
+metricmd/narrate.py       the only file where an LLM may appear, RBAC, feedback
+harness.py                62-scenario blind evaluation, the scorecard
+dashboard.py              renders the engine's output as a styled HTML dashboard
+export_frontend.py        runs the engine, exports data/frontend_data.json
+api.py                    zero dependency JSON API with server side entitlements,
+                          evidence masking, and feedback that persists mechanism
+                          priors and draft fingerprints (POST /api/feedback)
+docs/LOVABLE_PROMPT.md    the full prompt used to build the React console
+demo.py                   the four-story walkthrough
+docs/ARCHITECTURE.md      system diagram and design decisions
+docs/BUSINESS_PROPOSAL.md problem, market, pricing, roadmap, risks
+ASSUMPTIONS.md            every assumption, stated as the brief requires
+```
+
+## What is honestly simulated vs real
+
+Real and running: multi-source SQL reconciliation, seasonal detection, contribution analysis, fingerprint diagnosis, control-group falsification, post-action verification, abstention, RBAC, feedback capture, telemetry, and the 62-case measurement of all of it. Simulated: the business data itself (three generated source systems, as the brief instructs) and the LLM call is an optional hook so the repo runs with zero keys. The fingerprint library ships with 8 mechanisms; the production vision is roughly 30, grown by the UNKNOWN-to-fingerprint loop.
